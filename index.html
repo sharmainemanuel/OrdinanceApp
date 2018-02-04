@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Material Design Bootstrap</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Design Bootstrap -->
+    <link href="css/mdb.min.css" rel="stylesheet">
+    <!-- Your custom styles (optional) -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+       <nav class="navbar fixed-top navbar-expand-lg navbar-dark success-color">
+        <a class="navbar-brand" href="#">Ordinance App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li> -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Categories</a>
+                </li>
+
+            </ul>
+          <!--   <form class="form-inline">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+            </form> -->
+        </div>
+    </nav>
+        
+    <!--Main layout-->
+    <main>
+        
+        <div class="container-fluid">
+            <div class="container">
+                <h1>Scroll down</h1>
+                <br>
+               <form class="form-inline">
+                <input class="form-control mr-sm-2" type="text" placeholder="Search" id="search" aria-label="Search">
+            </form>
+
+            </div>
+            <div class="container"> 
+                <div id="display_data"></div>
+                <div id="showMe"></div>
+            </div>
+        </div>
+       
+        </main>
+
+    <!-- SCRIPTS -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery-3.2.1.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="js/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="js/mdb.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            getOrdinance();
+
+
+        });
+
+        $('#search').keyup(function(){
+        	var search = $('#search').val();
+   //     	console.log(search);
+			if(search === '')  {
+				//$('#display_data').html('');
+				getOrdinance();
+				return;
+			}
+         
+   			var data = "";
+     		$.ajax({
+                method: "GET",
+                dataType: "json",
+                url: "data.json",  
+                success: function (res)
+                {    
+                	   $.each(res, function(key, val){
+                	   	var tags = val.tags;
+                	   if(tags.includes(search)){
+                	   	data += "ID:" + val.ordinance;
+                	   	data += "Name" + val.description;
+                	   }
+
+                	   });
+                	   $('#display_data').html(data);
+                }
+        	});
+
+    // for (i = 0; i < li.length; i++) {
+    //     a = li[i].getElementsByTagName("a")[0];
+    //     if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
+    //         li[i].style.display = "";
+    //     } else {
+    //         li[i].style.display = "none";
+
+    //     }
+    // }
+
+        });
+
+
+        function getOrdinance()
+        {
+            $.ajax({
+                method: "GET",
+                dataType: "json",
+                url: "http://localhost/oc/oc/api/getOrdinance.php",  
+                success: function (res)
+                {              
+                    var data = " ";
+                    for (i=0; i < res.length; i++){
+                     // data += result[i].ordinance;
+                        data += "<div class=card>";
+                        data += "<div class=card-body>";
+                        data += "<h4 class=card-title>"+res[i].ordinance+"</h4>";
+                        data += "<p class=card-text>"+res[i].description+"</p>";
+                        data += "<p class=card-text>Tags: " +res[i].tags+"</p>";
+                        data += "<a href='#' class='btn btn-primary btn-sm'><i class='fa fa-file-pdf-o mr-2' aria-hidden='true'></i>pdf</a>";
+                        data += "<a href='#' onClick='readOrdinance("+res[i].id+")' class='btn btn-primary btn-sm'><i class='fa fa-book mr-2' aria-hidden='true'></i>read</a>"; 
+                        data += "</div></div>";
+                        data += "<br>";
+                    }
+
+                    $("#display_data").html(data);
+                },
+                error: function(error)
+                {
+                    alert("No Internet Connection");
+                    $("#display_data").html(error);
+                }
+            }); 
+        }
+
+        function readOrdinance($id)
+        {
+            alert($id);
+                 $.ajax({
+                method: "GET",
+                dataType: "json",
+                url: "http://localhost/oc/oc/api/getOrdinanceId.php?id="+$id,  
+                success: function (res)
+                {       
+                console.log(res);       
+                var data = " ";
+                    for (i=0; i < res.length; i++){
+                     // data += result[i].ordinance;
+                        data += "<div class=card>";
+                        data += "<div class=card-body>";
+                        data += "<h4 class=card-title>"+res[i].ordinance+"</h4>";
+                        data += "<p class=card-text>"+res[i].series+"</p>";
+                         data += "<p class=card-text>Series of:"+res[i].description+"</p>";
+                         data += "<object data=pdf/sample.pdf type=application/pdf width=300 height=200> alt : <a href=pdf/sample.pdf>sample pdf</a></object>";
+                        data += "<p class=card-text>Tags: " +res[i].tags+"</p>";
+                        data += "<a href='#' class='btn btn-primary btn-sm'><i class='fa fa-file-pdf-o mr-2' aria-hidden='true'></i>pdf</a>";
+                        data += "<a href='#' onClick='readOrdinance("+res[i].id+")' class='btn btn-primary btn-sm'><i class='fa fa-book mr-2' aria-hidden='true'></i>read</a>"; 
+                        data += "</div></div>";
+                        data += "<br>";
+                    }
+
+                    $("#display_data").html(data); 
+                    
+                  
+                },
+                error: function(error)
+                {
+                    alert("No Internet Connection");
+                    $("#display_data").html(error);
+                }
+            }); 
+        }
+    </script>
+
+</body>
+
+</html>
