@@ -27,21 +27,13 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link" href="#">Features</a>
-                </li> -->
-                <li class="nav-item">
+              <!--   <li class="nav-item">
                     <a class="nav-link" href="#">Categories</a>
                 </li>
-
+ -->
             </ul>
-          <!--   <form class="form-inline">
-                <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
-            </form> -->
         </div>
     </nav>
-        
-    <!--Main layout-->
     <main>
         
         <div class="container-fluid">
@@ -80,9 +72,7 @@
 
         $('#search').keyup(function(){
         	var search = $('#search').val();
-   //     	console.log(search);
 			if(search === '')  {
-				//$('#display_data').html('');
 				getOrdinance();
 				return;
 			}
@@ -94,27 +84,26 @@
                 url: "data.json",  
                 success: function (res)
                 {    
-                	   $.each(res, function(key, val){
-                	   	var tags = val.tags;
+                	   $.each(res, function(key, res){
+                	   	var tags = res.tags;
                 	   if(tags.includes(search)){
-                	   	data += "ID:" + val.ordinance;
-                	   	data += "Name" + val.description;
+                	 		data += "<div class=card>";
+	                        data += "<div class=card-body>";
+	                        data += "<h4 class=card-title>"+res.ordinance+"</h4>";
+	                        data += "<p class=card-text>"+res.series+"</p>";
+	                        data += "<p class=card-text>Series of:"+res.description+"</p>";
+	                        data += "<object data=pdf/sample.pdf type=application/pdf width=300 height=200> alt : <a href=pdf/sample.pdf>sample pdf</a></object>";
+	                        data += "<p class=card-text>Tags: " +res.tags+"</p>";
+	                        data += "<a href='#' class='btn btn-primary btn-sm'><i class='fa fa-file-pdf-o mr-2' aria-hidden='true'></i>pdf</a>";
+	                        data += "<a href='#' onClick='readOrdinance("+res.id+")' class='btn btn-primary btn-sm'><i class='fa fa-book mr-2' aria-hidden='true'></i>read</a>"; 
+	                        data += "</div></div>";
+	                        data += "<br>";
                 	   }
 
                 	   });
                 	   $('#display_data').html(data);
                 }
         	});
-
-    // for (i = 0; i < li.length; i++) {
-    //     a = li[i].getElementsByTagName("a")[0];
-    //     if (a.innerHTML.toUpperCase().indexOf(filter) > -1) {
-    //         li[i].style.display = "";
-    //     } else {
-    //         li[i].style.display = "none";
-
-    //     }
-    // }
 
         });
 
@@ -124,12 +113,11 @@
             $.ajax({
                 method: "GET",
                 dataType: "json",
-                url: "http://localhost/oc/oc/api/getOrdinance.php",  
+                url: "data.json",  
                 success: function (res)
                 {              
                     var data = " ";
                     for (i=0; i < res.length; i++){
-                     // data += result[i].ordinance;
                         data += "<div class=card>";
                         data += "<div class=card-body>";
                         data += "<h4 class=card-title>"+res[i].ordinance+"</h4>";
@@ -157,29 +145,32 @@
                  $.ajax({
                 method: "GET",
                 dataType: "json",
-                url: "http://localhost/oc/oc/api/getOrdinanceId.php?id="+$id,  
+                url: "data.json",  
                 success: function (res)
                 {       
                 console.log(res);       
                 var data = " ";
-                    for (i=0; i < res.length; i++){
-                     // data += result[i].ordinance;
-                        data += "<div class=card>";
-                        data += "<div class=card-body>";
-                        data += "<h4 class=card-title>"+res[i].ordinance+"</h4>";
-                        data += "<p class=card-text>"+res[i].series+"</p>";
-                         data += "<p class=card-text>Series of:"+res[i].description+"</p>";
-                         data += "<object data=pdf/sample.pdf type=application/pdf width=300 height=200> alt : <a href=pdf/sample.pdf>sample pdf</a></object>";
-                        data += "<p class=card-text>Tags: " +res[i].tags+"</p>";
-                        data += "<a href='#' class='btn btn-primary btn-sm'><i class='fa fa-file-pdf-o mr-2' aria-hidden='true'></i>pdf</a>";
-                        data += "<a href='#' onClick='readOrdinance("+res[i].id+")' class='btn btn-primary btn-sm'><i class='fa fa-book mr-2' aria-hidden='true'></i>read</a>"; 
-                        data += "</div></div>";
-                        data += "<br>";
-                    }
+
+
+					  $.each(res, function(key, res)
+					  {
+	                	if(res.id == $id)
+	                	{
+	                        data += "<div class=card>";
+	                        data += "<div class=card-body>";
+	                        data += "<h4 class=card-title>"+res.ordinance+"</h4>";
+	                        data += "<p class=card-text>"+res.series+"</p>";
+	                        data += "<p class=card-text>Series of:"+res.description+"</p>";
+	                        data += "<object data=pdf/sample.pdf type=application/pdf width=300 height=200> alt : <a href=pdf/sample.pdf>sample pdf</a></object>";
+	                        data += "<p class=card-text>Tags: " +res.tags+"</p>";
+	                        data += "<a href='#' class='btn btn-primary btn-sm'><i class='fa fa-file-pdf-o mr-2' aria-hidden='true'></i>pdf</a>";
+	                        data += "<a href='#' onClick='readOrdinance("+res.id+")' class='btn btn-primary btn-sm'><i class='fa fa-book mr-2' aria-hidden='true'></i>read</a>"; 
+	                        data += "</div></div>";
+	                        data += "<br>";
+	                	  }
+                	  });
 
                     $("#display_data").html(data); 
-                    
-                  
                 },
                 error: function(error)
                 {
